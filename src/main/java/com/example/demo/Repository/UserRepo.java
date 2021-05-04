@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 import com.example.demo.model.UserModel;
 @Repository
 public interface UserRepo extends MongoRepository<UserModel, String> {
-	  public List<UserModel> findByPhone(String Phone);
+	  
 }

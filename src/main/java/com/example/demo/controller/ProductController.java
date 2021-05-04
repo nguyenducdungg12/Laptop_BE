@@ -29,6 +29,16 @@ public class ProductController {
 			return new ResponseEntity<List<ProductModel>>(listProduct,HttpStatus.OK);
 		}
 		return new ResponseEntity<String>("Khong co san pham nao",HttpStatus.OK);
+		
+	}
+	@GetMapping("/api/products/{category}")
+	public ResponseEntity<?> getProductByCategory(@PathVariable("category") String category , @RequestParam(defaultValue = "1") int page,@RequestParam(required = false) String type){
+		List<ProductModel> listProduct = productService.getProductByCategory(category, type, page);
+		if(listProduct.size()>0) {
+			return new ResponseEntity<List<ProductModel>>(listProduct,HttpStatus.OK);
+		}
+		return new ResponseEntity<String>("Khong co san pham nao",HttpStatus.OK);
+		
 	}
 	@GetMapping("/api/product/{id}")
 	public ResponseEntity<?> getProductById(@PathVariable("id") String id){
