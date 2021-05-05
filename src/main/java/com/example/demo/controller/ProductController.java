@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,31 +13,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.DTO.ProductsResponse;
 import com.example.demo.Service.ProductService;
 import com.example.demo.model.ProductModel;
-@CrossOrigin(maxAge = 3600)
 @RestController
 public class ProductController {
 	@Autowired
 	ProductService productService;
 	
 	@GetMapping("/api/products")
-	public ResponseEntity<?> getAllProducts(@RequestParam(defaultValue = "1") int page){
-		List<ProductModel> listProduct = productService.getAllProduct();
-		if(listProduct.size()>0) {
-			return new ResponseEntity<List<ProductModel>>(listProduct,HttpStatus.OK);
+	public ResponseEntity<?> getAllProducts(@RequestParam(defaultValue = "1",name="page") int page,@RequestParam(defaultValue = "",name="search") String search){
+		ProductsResponse listProduct;
+		if(!search.equals("")) {
+			listProduct = (ProductsResponse) productService.getProductByTitle(search);
 		}
-		return new ResponseEntity<String>("Khong co san pham nao",HttpStatus.OK);
+//		else {			
+//			listProduct = productService.getAllProduct(page);
+//		}
+//		if(listProduct.getListProducts().size()>0) {
+			return ResponseEntity.ok(productService.getAllProduct(page));
+//		}
+//		return new ResponseEntity<String>("Khong co san pham nao",HttpStatus.OK);
 		
 	}
 	@GetMapping("/api/products/{category}")
-	public ResponseEntity<?> getProductByCategory(@PathVariable("category") String category , @RequestParam(defaultValue = "1") int page,@RequestParam(required = false) String type){
+	public ResponseEntity<?> getProductByCategory(@PathVariable("category") String category , @RequestParam(defaultValue = "1",name="page") int page,@RequestParam(defaultValue="1",name="type") String type){
 		List<ProductModel> listProduct = productService.getProductByCategory(category, type, page);
 		if(listProduct.size()>0) {
+			
 			return new ResponseEntity<List<ProductModel>>(listProduct,HttpStatus.OK);
 		}
-		return new ResponseEntity<String>("Khong co san pham nao",HttpStatus.OK);
-		
+		return new ResponseEntity<List<ProductModel>>(listProduct,HttpStatus.NOT_FOUND);
+
 	}
 	@GetMapping("/api/product/{id}")
 	public ResponseEntity<?> getProductById(@PathVariable("id") String id){
