@@ -40,7 +40,9 @@ public class ProductServiceImpl implements ProductService {
 					productResponse.setListProducts(ListProduct.subList((page-1)*15, ListProduct.size()));
 				}
 			}
-			productResponse.setListProducts(ListProduct.subList((page-1)*15, page*15));
+			else {				
+				productResponse.setListProducts(ListProduct.subList((page-1)*15, page*15));
+			}
 		}
 		productResponse.setTotalProduct(ListProduct.size());
 		productResponse.setTotalPage((productResponse.getTotalProduct()/15)+1);
@@ -58,29 +60,60 @@ public class ProductServiceImpl implements ProductService {
 		return Products.findById(id);
 	}
 	@Override
-	public List<ProductModel> getProductByCategory(String category, String Type, int page) {
-			List<ProductModel> ListProduct= Products.findByCategoryAndType(category,Type);
-			if(page==1) {
-				
-				if(ListProduct.size()<page*15) {
-					productResponse.setListProducts(ListProduct);
-				}
-				return ListProduct.subList(0, page*15);
+	public ProductsResponse getProductByCategory(String category, String Type, int page) {
+		List<ProductModel> ListProduct;
+		if(!category.equals("PK")) {				
+				ListProduct= Products.findByCategoryAndType(category,Type);
 			}
-			else {
-				if(ListProduct.size()<page*15) {
-					if((page+1)*15-ListProduct.size()>15) {
-						return Collections.emptyList();
-					}
-					else {
-						return  ListProduct.subList((page-1)*15, ListProduct.size());
-					}
-				}
-				return ListProduct.subList((page-1)*15, page*15);
-			}
+		else {
+			ListProduct = Products.findByCategoryAndTypePK(category,Type);
+		}
+//			if(page==1) {
+//				if(ListProduct.size()<page*15) {
+//					productResponse.setListProducts(ListProduct);
+//				}
+//				productResponse.setListProducts(ListProduct.subList(0, page*15-1));
+//			}
+//			else {
+//				if(ListProduct.size()<page*15) {
+//					if((page+1)*15-ListProduct.size()>15) {
+//						productResponse.setListProducts(Collections.emptyList());
+//					}
+//					else {
+//						productResponse.setListProducts(ListProduct.subList((page-1)*15, ListProduct.size()));
+//					}
+//				}
+//				productResponse.setListProducts(ListProduct.subList((page-1)*15, page*15-1));
+//			}
+			productResponse.setListProducts(ListProduct);
+			productResponse.setTotalProduct(ListProduct.size());
+			productResponse.setTotalPage((productResponse.getTotalProduct()/15)+1);
+			productResponse.setProductPerPage(15);
+			return productResponse;
 	}
-	public List<ProductModel> getProductByTitle(String search) {
-		return Products.findByTitle(search);
+	public ProductsResponse getProductByTitle(String search,int page) {
+		List<ProductModel> ListProduct=Products.findByTitle(search);;
+		if(page==1) {
+			if(ListProduct.size()<page*15) {
+				productResponse.setListProducts(ListProduct);
+			}
+			productResponse.setListProducts(ListProduct.subList(0, page*15));
+		}
+		else {
+			if(ListProduct.size()<page*15) {
+				if((page+1)*15-ListProduct.size()>15) {
+					productResponse.setListProducts(Collections.emptyList());
+				}
+				else {
+					productResponse.setListProducts(ListProduct.subList((page-1)*15, ListProduct.size()));
+				}
+			}
+			productResponse.setListProducts(ListProduct.subList((page-1)*15, page*15));
+		}
+		productResponse.setTotalProduct(ListProduct.size());
+		productResponse.setTotalPage((productResponse.getTotalProduct()/15)+1);
+		productResponse.setProductPerPage(15);
+		return productResponse;
 	}
 
 

@@ -25,25 +25,18 @@ public class ProductController {
 	public ResponseEntity<?> getAllProducts(@RequestParam(defaultValue = "1",name="page") int page,@RequestParam(defaultValue = "",name="search") String search){
 		ProductsResponse listProduct;
 		if(!search.equals("")) {
-			listProduct = (ProductsResponse) productService.getProductByTitle(search);
+			listProduct = productService.getProductByTitle(search, page);
 		}
-//		else {			
-//			listProduct = productService.getAllProduct(page);
-//		}
-//		if(listProduct.getListProducts().size()>0) {
-			return ResponseEntity.ok(productService.getAllProduct(page));
-//		}
-//		return new ResponseEntity<String>("Khong co san pham nao",HttpStatus.OK);
+		else {			
+			listProduct = productService.getAllProduct(page);
+		}
+		return ResponseEntity.ok(listProduct);
 		
 	}
 	@GetMapping("/api/products/{category}")
 	public ResponseEntity<?> getProductByCategory(@PathVariable("category") String category , @RequestParam(defaultValue = "1",name="page") int page,@RequestParam(defaultValue="1",name="type") String type){
-		List<ProductModel> listProduct = productService.getProductByCategory(category, type, page);
-		if(listProduct.size()>0) {
-			
-			return new ResponseEntity<List<ProductModel>>(listProduct,HttpStatus.OK);
-		}
-		return new ResponseEntity<List<ProductModel>>(listProduct,HttpStatus.NOT_FOUND);
+		ProductsResponse listProduct = productService.getProductByCategory(category, type, page);
+		return ResponseEntity.ok(listProduct);
 
 	}
 	@GetMapping("/api/product/{id}")

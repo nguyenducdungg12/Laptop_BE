@@ -12,7 +12,7 @@ public interface ProductService {
 	ProductsResponse getAllProduct(int page);
 	ProductModel addProduct(ProductModel product);
 	Optional<ProductModel> findProductById(String id);
-	List<ProductModel> getProductByCategory(String category, String Type, int page);
-	List<ProductModel> getProductByTitle(String search);
+	ProductsResponse getProductByCategory(String category, String Type, int page);
+	ProductsResponse getProductByTitle(String search,int page);
 }
 	
