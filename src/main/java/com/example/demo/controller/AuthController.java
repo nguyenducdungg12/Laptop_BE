@@ -1,29 +1,41 @@
 package com.example.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.DTO.LoginRequest;
+import com.example.demo.DTO.LoginResponse;
 import com.example.demo.DTO.RegisterRequest;
+import com.example.demo.DTO.RegisterResponse;
+import com.example.demo.Service.AuthService;
 import com.example.demo.Service.UserService;
 
 @RestController
+@RequestMapping("api/auth")
 public class AuthController {
 	@Autowired
 	UserService userService;
-	
-	@PostMapping("api/auth/register")
-	public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest){
-		userService.registerUser(registerRequest);
+	@Autowired
+	AuthService authService;
+	@PostMapping("/register")
+	public RegisterResponse registerUser(@RequestBody RegisterRequest registerRequest){
+		RegisterResponse registerResponse = new RegisterResponse();
+		try {
+			userService.registerUser(registerRequest);
+			registerResponse.setStatusCode(200);
+			registerResponse.setMsg("Tạo tài khoản thành công");
+		}
+		catch(Exception e) {
+			registerResponse.setStatusCode(403);
+			registerResponse.setMsg("Lỗi : "+e);
+		}
+		return registerResponse;
 	}
-//	@GetMapping("api/auth/user/${id}")
-//	public ResponseEntity<?> getUser(){
-//		List<UserModel> ListUser = User.findAll();
-//		if(ListUser.size()>0) {
-//			return new ResponseEntity<>(ListUser,HttpStatus.OK);
-//		}
-//		return new ResponseEntity<>(ListUser,HttpStatus.OK);
-//	}
+	@PostMapping("/login")
+	public LoginResponse registerUser(@RequestBody LoginRequest loginRequest){
+		return authService.Login(loginRequest);
+	}
 }
