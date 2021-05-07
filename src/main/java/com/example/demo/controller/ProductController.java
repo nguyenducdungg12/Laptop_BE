@@ -39,7 +39,7 @@ public class ProductController {
 		return ResponseEntity.ok(listProduct);
 
 	}
-	@GetMapping("/api/product/{id}")
+	@GetMapping("/api/products/{id}")
 	public ResponseEntity<?> getProductById(@PathVariable("id") String id){
 		Optional<ProductModel> Product = productService.findProductById(id);
 		if(Product.isPresent()) {

@@ -27,4 +27,6 @@ public class UserModel {
 	public String email;
 	@Field(value="image")
 	public String image;
+	@Field(value="role")
+	public String role;
 }

@@ -15,5 +15,4 @@ public class ProductsResponse {
 	int TotalPage;
 	int ProductPerPage;
 	int TotalProduct;
-	
 }

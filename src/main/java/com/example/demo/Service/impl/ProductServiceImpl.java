@@ -66,26 +66,29 @@ public class ProductServiceImpl implements ProductService {
 				ListProduct= Products.findByCategoryAndType(category,Type);
 			}
 		else {
-			ListProduct = Products.findByCategoryAndTypePK(category,Type);
+				ListProduct = Products.findByCategoryAndTypePK("laptop",Type);
 		}
-//			if(page==1) {
-//				if(ListProduct.size()<page*15) {
-//					productResponse.setListProducts(ListProduct);
-//				}
-//				productResponse.setListProducts(ListProduct.subList(0, page*15-1));
-//			}
-//			else {
-//				if(ListProduct.size()<page*15) {
-//					if((page+1)*15-ListProduct.size()>15) {
-//						productResponse.setListProducts(Collections.emptyList());
-//					}
-//					else {
-//						productResponse.setListProducts(ListProduct.subList((page-1)*15, ListProduct.size()));
-//					}
-//				}
-//				productResponse.setListProducts(ListProduct.subList((page-1)*15, page*15-1));
-//			}
-			productResponse.setListProducts(ListProduct);
+			if(page==1) {
+				if(ListProduct.size()<page*15) {
+					productResponse.setListProducts(ListProduct);
+				}
+				else {					
+					productResponse.setListProducts(ListProduct.subList(0, page*15-1));
+				}
+			}
+			else {
+				if(ListProduct.size()<page*15) {
+					if((page+1)*15-ListProduct.size()>15) {
+						productResponse.setListProducts(Collections.emptyList());
+					}
+					else {
+						productResponse.setListProducts(ListProduct.subList((page-1)*15, ListProduct.size()));
+					}
+				}
+				else {					
+					productResponse.setListProducts(ListProduct.subList((page-1)*15, page*15-1));
+				}
+			}
 			productResponse.setTotalProduct(ListProduct.size());
 			productResponse.setTotalPage((productResponse.getTotalProduct()/15)+1);
 			productResponse.setProductPerPage(15);
@@ -97,7 +100,9 @@ public class ProductServiceImpl implements ProductService {
 			if(ListProduct.size()<page*15) {
 				productResponse.setListProducts(ListProduct);
 			}
-			productResponse.setListProducts(ListProduct.subList(0, page*15));
+			else {				
+				productResponse.setListProducts(ListProduct.subList(0, page*15));
+			}
 		}
 		else {
 			if(ListProduct.size()<page*15) {
@@ -108,7 +113,9 @@ public class ProductServiceImpl implements ProductService {
 					productResponse.setListProducts(ListProduct.subList((page-1)*15, ListProduct.size()));
 				}
 			}
-			productResponse.setListProducts(ListProduct.subList((page-1)*15, page*15));
+			else {				
+				productResponse.setListProducts(ListProduct.subList((page-1)*15, page*15));
+			}
 		}
 		productResponse.setTotalProduct(ListProduct.size());
 		productResponse.setTotalPage((productResponse.getTotalProduct()/15)+1);

@@ -14,5 +14,6 @@ public interface ProductService {
 	Optional<ProductModel> findProductById(String id);
 	ProductsResponse getProductByCategory(String category, String Type, int page);
 	ProductsResponse getProductByTitle(String search,int page);
+	
 }
 	
