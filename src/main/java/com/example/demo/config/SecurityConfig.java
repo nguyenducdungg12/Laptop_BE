@@ -39,8 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	        return new BCryptPasswordEncoder();
 	   }
 	  @Override
-	    protected void configure(AuthenticationManagerBuilder auth)
-	            throws Exception {
+	    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 	        auth.userDetailsService(userService) 
 	            .passwordEncoder(passwordEncoder()); 
 	    }
@@ -50,8 +49,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		http.cors().and()
 		.csrf().disable()
 		.authorizeRequests()
-		.antMatchers(HttpMethod.POST,"/api/auth/login/**").permitAll()
-		.antMatchers(HttpMethod.POST,"/api/auth/register/**").permitAll()
+		.antMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
+		.antMatchers(HttpMethod.POST,"/api/auth/register").permitAll()
 		.antMatchers("/api/products/**").permitAll()
 		.anyRequest()
 		.authenticated();

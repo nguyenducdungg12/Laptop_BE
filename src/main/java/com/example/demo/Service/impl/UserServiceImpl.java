@@ -30,13 +30,12 @@ public class UserServiceImpl implements UserService,UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Optional<UserModel> UserOption = UserRepo.findByUsername(username);
 		
+		Optional<UserModel> UserOption = UserRepo.findByUsername(username);
 		UserModel User = UserOption.orElseThrow(() -> new UsernameNotFoundException("No user " +
                 "Found with username : " + username));
-		return new CustomUserDetails(User);
+			return new CustomUserDetails(User);
 	}
-
 	@Override
 	public UserDetails loadUserById(String userId) {
 	Optional<UserModel> UserOption = UserRepo.findById(userId);
