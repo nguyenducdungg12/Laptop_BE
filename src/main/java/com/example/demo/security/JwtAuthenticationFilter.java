@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.example.demo.Exception.CustomException;
 import com.example.demo.Service.UserService;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -36,14 +37,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	                    		authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 	                    		SecurityContextHolder.getContext().setAuthentication(authentication);
 	                }
-	            }
-	        filterChain.doFilter(request, response);
+	                }
+	            filterChain.doFilter(request, response);
+	            
+	            
+
 	    }
 	
 	   private String getJwtFromRequest(HttpServletRequest request) {
 	        String bearerToken = request.getHeader("Authorization");
-	        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-	            return bearerToken.substring(7);
+	        if (StringUtils.hasText(bearerToken)) {
+	            return bearerToken;
 	        }
 	        return null;
 	    }

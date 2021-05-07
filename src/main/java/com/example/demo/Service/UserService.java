@@ -10,5 +10,4 @@ import com.example.demo.model.UserModel;
 public interface UserService {
 	List<UserModel> findAll();
 	UserDetails loadUserById(String userId);
-	void registerUser(RegisterRequest registerRequest);
 }

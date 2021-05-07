@@ -17,4 +17,6 @@ public class UserResponse {
 	public String email;
     public String image;
     private String role;
+    int StatusCode;
+    
 }

@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,27 +27,36 @@ public class AuthController {
 	AuthService authService;
 	@Autowired
 	PasswordEncoder passwordEncoder;
+
 	@PostMapping("/register")
 	public RegisterResponse registerUser(@RequestBody RegisterRequest registerRequest){
-		registerRequest.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 		RegisterResponse registerResponse = new RegisterResponse();
 		try {
-			userService.registerUser(registerRequest);
+			authService.registerUser(registerRequest);
 			registerResponse.setStatusCode(200);
 			registerResponse.setMsg("Tạo tài khoản thành công");
 		}
 		catch(Exception e) {
 			registerResponse.setStatusCode(403);
-			registerResponse.setMsg("Lỗi : "+e);
+			registerResponse.setMsg(e.getLocalizedMessage());
 		}
 		return registerResponse;
 	}
 	@PostMapping("/login")
-	public LoginResponse login(@RequestBody LoginRequest loginRequest){
-		return authService.Login(loginRequest);
+	public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest){
+		LoginResponse loginResponse = authService.Login(loginRequest);
+		if(loginResponse.getStatusCode()!=200) {
+			return new ResponseEntity<LoginResponse>(loginResponse,HttpStatus.NOT_FOUND);
+		}
+		return ResponseEntity.ok(loginResponse);
+		
 	}
 	@GetMapping("/user")
-	public UserResponse getUser() {
-		return authService.getUserCurrent();
+	public ResponseEntity<?> getUser() {
+		UserResponse userResponse = authService.getUserCurrent();
+		if(userResponse.getStatusCode()!=200) {
+			return new ResponseEntity<UserResponse>(userResponse,HttpStatus.NOT_FOUND);
+		}
+		return ResponseEntity.ok(userResponse);
 	}
 }

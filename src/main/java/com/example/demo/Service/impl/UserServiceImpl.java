@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.DTO.RegisterRequest;
@@ -42,27 +43,6 @@ public class UserServiceImpl implements UserService,UserDetailsService {
 		UserModel User = UserOption.orElseThrow(() -> new UsernameNotFoundException("No user " +
                 "Found with id : " + userId));
 		return new CustomUserDetails(User);
-	}
-
-	@Override
-	public void registerUser(RegisterRequest registerRequest) {
-		  Optional<UserModel> isUserValid  = UserRepo.findByUsername(registerRequest.getUsername());
-		  if(isUserValid.isPresent()) {
-	            throw new CustomException("Username is aldready use");
-		  }
-		  if (registerRequest.getUsername().length() < 5 || registerRequest.getPassword().length() < 5) {
-	            throw new CustomException("Email and password must bigger than 5");
-	        }
-		UserModel newUser = new UserModel();
-		newUser.setUsername(registerRequest.getUsername());
-		newUser.setPassword(registerRequest.getPassword());
-		newUser.setPhone(registerRequest.getPhone());
-		newUser.setEmail(registerRequest.getEmail());
-		newUser.setRole("USER");
-		newUser.setCreateBy(new Date());
-		newUser.setUpdatedBy(new Date());
-		newUser.setImage("https://cdn.shortpixel.ai/client/q_glossy,ret_img,w_632,h_316/https://gocsuckhoe.com/wp-content/uploads/2020/09/avatar-facebook-632x316.jpg");
-		UserRepo.save(newUser);
 	}
 	
 }

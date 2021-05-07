@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter();
     }
-	 @Bean
+		@Bean
 	    public PasswordEncoder passwordEncoder() {
 	        return new BCryptPasswordEncoder();
 	   }
@@ -50,6 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		.csrf().disable()
 		.authorizeRequests()
 		.antMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
+		.antMatchers(HttpMethod.GET,"/api/auth/user").permitAll()
 		.antMatchers(HttpMethod.POST,"/api/auth/register").permitAll()
 		.antMatchers("/api/products/**").permitAll()
 		.anyRequest()
