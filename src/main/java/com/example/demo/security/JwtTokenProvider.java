@@ -29,6 +29,16 @@ public class JwtTokenProvider {
                    .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
                    .compact();
     }
+    public String generateTokenForgotPassword(String email) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
+        return Jwts.builder()
+                   .setSubject(email)
+                   .setIssuedAt(now)
+                   .setExpiration(expiryDate)
+                   .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
+                   .compact();
+    }
     // get info into jwt
     public String getUserIdFromJWT(String token) {
         Claims claims = Jwts.parser()

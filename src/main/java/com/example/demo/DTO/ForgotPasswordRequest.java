@@ -3,12 +3,11 @@ package com.example.demo.DTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-@AllArgsConstructor
-@NoArgsConstructor
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class RegisterResponse {
-	public long statusCode;
-	public String msg;
-	
+public class ForgotPasswordRequest {
+	String email;
+	String password;
 }

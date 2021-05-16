@@ -3,12 +3,11 @@ package com.example.demo.DTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-@AllArgsConstructor
-@NoArgsConstructor
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class RegisterResponse {
-	public long statusCode;
+public class OrderResponse {
 	public String msg;
-	
+	public int statusCode;
 }

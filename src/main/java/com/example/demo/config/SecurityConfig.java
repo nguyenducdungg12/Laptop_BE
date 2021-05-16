@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -51,10 +52,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		.authorizeRequests()
 		.antMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
 		.antMatchers(HttpMethod.GET,"/api/auth/user").permitAll()
+		.antMatchers(HttpMethod.GET,"/image/**").permitAll()
 		.antMatchers(HttpMethod.POST,"/api/auth/register").permitAll()
+		.antMatchers(HttpMethod.POST,"/api/auth/forgot/**").permitAll()
+		.antMatchers(HttpMethod.GET,"/api/auth/forgot/**").permitAll()
+		.antMatchers(HttpMethod.GET,"/api/auth/accountVerification/**").permitAll()
 		.antMatchers("/api/products/**").permitAll()
+		.antMatchers("/api/detailproducts/**").permitAll()
 		.anyRequest()
 		.authenticated();
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+	}
+	@Override
+	public void configure(WebSecurity web) throws Exception {
+		
+		super.configure(web);
+		web.ignoring().antMatchers("/image/**");
 	}
 }

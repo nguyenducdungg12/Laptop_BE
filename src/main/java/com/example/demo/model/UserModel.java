@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -29,4 +30,16 @@ public class UserModel {
 	public String image;
 	@Field(value="role")
 	public String role;
+	@Field(value="enable")
+	Boolean enable;
+	@Field(value="verificationcode")
+	String verificationcode;
+	@Field(value="forgotpassword")
+	String forgotpassword;
+	@Field(value="ngaysinh")
+    public String ngaysinh;
+	@Field(value="sex")
+    public String sex;
+	@Field(value="order")
+	List<OrderModel> orders;
 }

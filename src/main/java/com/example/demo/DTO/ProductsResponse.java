@@ -6,7 +6,11 @@ import org.springframework.stereotype.Component;
 
 import com.example.demo.model.ProductModel;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+@AllArgsConstructor
+@NoArgsConstructor
 
 @Data
 @Component

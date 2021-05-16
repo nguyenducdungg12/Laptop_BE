@@ -10,4 +10,6 @@ import com.example.demo.model.UserModel;
 public interface UserRepo extends MongoRepository<UserModel, String> {
 
 	  Optional<UserModel> findByUsername(String username);
+	  Optional<UserModel> findByVerificationcode(String verificationcode);
+	  Optional<UserModel> findByEmail(String email);
 }

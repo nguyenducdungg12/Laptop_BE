@@ -1,6 +1,5 @@
 package com.example.demo.Service.impl;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,11 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.DTO.RegisterRequest;
-import com.example.demo.Exception.CustomException;
 import com.example.demo.Repository.UserRepo;
 import com.example.demo.Service.UserService;
 import com.example.demo.model.CustomUserDetails;
@@ -43,6 +39,11 @@ public class UserServiceImpl implements UserService,UserDetailsService {
 		UserModel User = UserOption.orElseThrow(() -> new UsernameNotFoundException("No user " +
                 "Found with id : " + userId));
 		return new CustomUserDetails(User);
+	}
+
+	@Override
+	public Optional<UserModel> findByVerificationcode(String verificationcode) {
+			return UserRepo.findByVerificationcode(verificationcode);
 	}
 	
 }
