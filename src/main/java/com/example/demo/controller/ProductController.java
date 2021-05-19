@@ -22,20 +22,19 @@ public class ProductController {
 	ProductService productService;
 	
 	@GetMapping("/api/products")
-	public ResponseEntity<?> getAllProducts(@RequestParam(defaultValue = "1",name="page") int page,@RequestParam(defaultValue = "",name="search") String search){
-		
+	public ResponseEntity<?> getAllProducts(@RequestParam(defaultValue = "1",name="page") int page,@RequestParam(defaultValue = "0",name="sort") int sort,@RequestParam(defaultValue = "0",name="max") long max,@RequestParam(defaultValue = "0",name="min",required = false) long min,@RequestParam(defaultValue = "",name="search") String search){
 		ProductsResponse listProduct;
 		if(!search.equals("")) {
-			listProduct = productService.getProductByTitle(search, page);
+			listProduct = productService.getProductByTitle(search, page,sort,max,min);
 		}
 		else {			
-			listProduct = productService.getAllProduct(page);
+			listProduct = productService.getAllProduct(page,sort,max,min);
 		}
 		return ResponseEntity.ok(listProduct);
 	}
 	@GetMapping("/api/products/{category}")
-	public ResponseEntity<?> getProductByCategory(@PathVariable("category") String category , @RequestParam(defaultValue = "1",name="page") int page,@RequestParam(defaultValue="1",name="type") String type){
-		ProductsResponse listProduct = productService.getProductByCategory(category, type, page);
+	public ResponseEntity<?> getProductByCategory(@PathVariable("category") String category ,@RequestParam(defaultValue = "0",name="sort") int sort,@RequestParam(defaultValue = "0",name="max") long max,@RequestParam(defaultValue = "0",name="min",required = false) long min, @RequestParam(defaultValue = "1",name="page") int page,@RequestParam(defaultValue="1",name="type") String type){
+		ProductsResponse listProduct = productService.getProductByCategory(category,sort,max,min, type, page);
 		return ResponseEntity.ok(listProduct);
 
 	}

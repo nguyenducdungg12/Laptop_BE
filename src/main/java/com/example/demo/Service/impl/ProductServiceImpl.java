@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.DTO.ProductsResponse;
@@ -20,8 +21,26 @@ public class ProductServiceImpl implements ProductService {
 	@Autowired
 	ProductsResponse productResponse;
 	@Override
-	public ProductsResponse getAllProduct(int page) {
-		List<ProductModel> ListProduct= Products.findAll();
+	public ProductsResponse getAllProduct(int page,int sort,long max,long min) {
+		List<ProductModel> ListProduct;
+		if(sort!=0){
+			Sort sorts = sort==1 ?  Sort.by(Sort.Direction.ASC,"newprice") : Sort.by(Sort.Direction.DESC,"newprice");
+			if(max!=0) {
+				ListProduct = Products.findByNewpriceRangeSort(sorts,max, min);
+			}
+			else {			
+				ListProduct = Products.findByNewpriceRangeSortGreatthan(sorts,min);
+			}
+		}
+		else {
+			if(max!=0) {
+				ListProduct= Products.findByNewpriceRangeSort(null,max, min);
+
+			}
+			else {
+				ListProduct= Products.findByNewpriceRangeSortGreatthan(null,min);
+				}
+		}
 		if(page==1) {
 			if(ListProduct.size()<page*15) {
 				productResponse.setListProducts(ListProduct);
@@ -60,13 +79,47 @@ public class ProductServiceImpl implements ProductService {
 		return Products.findById(id);
 	}
 	@Override
-	public ProductsResponse getProductByCategory(String category, String Type, int page) {
+	public ProductsResponse getProductByCategory(String category,int sort,long max,long min, String Type, int page) {
 		List<ProductModel> ListProduct;
-		if(!category.equals("PK")) {				
-				ListProduct= Products.findByCategoryAndType(category,Type);
+		if(!category.equals("PK")) {
+			if(sort!=0){
+				Sort sorts = sort==1 ?  Sort.by(Sort.Direction.ASC,"newprice") : Sort.by(Sort.Direction.DESC,"newprice");
+				if(max!=0) {
+					ListProduct = Products.findByCategoryAndTypeRangeSort(category,Type,max, min,sorts);
+				}
+				else {			
+					ListProduct = Products.findByCategoryAndTypeSort(category,Type,min,sorts);
+				}
 			}
+			else {
+				if(max!=0) {
+					ListProduct= Products.findByCategoryAndTypeRangeSort(category,Type,max,min,null);
+
+				}
+				else {
+					ListProduct= Products.findByCategoryAndTypeSort(category,Type,min,null);
+					}
+				}
+		}
 		else {
-				ListProduct = Products.findByCategoryAndTypePK("laptop",Type);
+			if(sort!=0){
+				Sort sorts = sort==1 ?  Sort.by(Sort.Direction.ASC,"newprice") : Sort.by(Sort.Direction.DESC,"newprice");
+				if(max!=0) {
+					ListProduct = Products.findByCategoryAndTypeRangeSortPK("laptop",Type,max, min,sorts);
+				}
+				else {			
+					ListProduct = Products.findByCategoryAndTypeRangeSortGreatthan("laptop",Type,min,sorts);
+				}
+			}
+			else {
+				if(max!=0) {
+					ListProduct= Products.findByCategoryAndTypeRangeSortPK("laptop",Type,max,min,null);
+
+				}
+				else {
+					ListProduct= Products.findByCategoryAndTypeRangeSortGreatthan("laptop",Type,min,null);
+					}
+				}
 		}
 			if(page==1) {
 				if(ListProduct.size()<page*15) {
@@ -94,8 +147,24 @@ public class ProductServiceImpl implements ProductService {
 			productResponse.setProductPerPage(15);
 			return productResponse;
 	}
-	public ProductsResponse getProductByTitle(String search,int page) {
-		List<ProductModel> ListProduct=Products.findByTitle(search);;
+	public ProductsResponse getProductByTitle(String search,int page,int sort,long max,long min) {
+		List<ProductModel> ListProduct;
+		if(sort!=0){
+			Sort sorts =sort==1 ?  Sort.by(Sort.Direction.ASC,"newprice") : Sort.by(Sort.Direction.DESC,"newprice");
+			if(max!=0) {
+				ListProduct = Products.findByTitleRangeSort(search,sorts,max, min);
+			}else {
+				ListProduct = Products.findByTitleSort(search, min, sorts);
+			}
+		}
+		else {
+			if(max!=0) {
+				ListProduct= Products.findByTitleRangeSort(search,null, max, min);
+			}
+			else {
+				ListProduct= Products.findByTitleSort(search, min,null);
+				}
+		}
 		if(page==1) {
 			if(ListProduct.size()<page*15) {
 				productResponse.setListProducts(ListProduct);

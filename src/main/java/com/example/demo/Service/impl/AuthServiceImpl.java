@@ -96,12 +96,15 @@ public class AuthServiceImpl implements AuthService {
 	public UserResponse getUserCurrent() {
 		UserResponse userResponse = new UserResponse();
 		try {
-			CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();				
-			userResponse.setEmail(currentUser.getUser().getEmail());
-			userResponse.setImage(currentUser.getUser().getImage());
-			userResponse.setPhone(currentUser.getUser().getPhone());
-			userResponse.setRole(currentUser.getUser().getRole());
-			userResponse.setUsername(currentUser.getUsername());
+			CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();		
+			Optional<UserModel> user= UserRepo.findByUsername(currentUser.getUsername());	
+			userResponse.setEmail(user.get().getEmail());
+			userResponse.setImage(user.get().getImage());
+			userResponse.setPhone(user.get().getPhone());
+			userResponse.setRole(user.get().getRole());
+			userResponse.setUsername(user.get().getUsername());
+			userResponse.setNgaysinh(user.get().getNgaysinh());
+			userResponse.setSex(user.get().getSex());
 			userResponse.setStatusCode(200);
 			return userResponse;
 		}
@@ -265,32 +268,38 @@ public class AuthServiceImpl implements AuthService {
 		UserResponse userReponse = getUserCurrent();
 		Optional<UserModel> user= UserRepo.findByUsername(userReponse.getUsername());
 		if(user.isPresent()) {
+			user.get().setPhone(updateUserRequest.getPhone());
 			user.get().setSex(updateUserRequest.getSex());
 			user.get().setNgaysinh(updateUserRequest.getNgaysinh());
 			if(multipartFile!=null) {					
 				String fileName = multipartFile.getOriginalFilename();
-		        Path uploadPath = Paths.get("dsadsadadsa");
+		        Path uploadPath = Paths.get("src/main/resources/static/image");
 				try {
-		            System.out.println(uploadPath);
 					InputStream inputStream = multipartFile.getInputStream();
 		            Path filePath = uploadPath.resolve(fileName);
-		            System.out.println(filePath);
 		            Files.copy(inputStream, filePath,StandardCopyOption.REPLACE_EXISTING);
 				} catch (IOException e) {
 					 new CustomException(e.getLocalizedMessage());
 				}
 				user.get().setImage("http://localhost:8080/image/"+fileName);
 			}
-			if(!updateUserRequest.getCurrentPassword().equals("")&&user.get().getPassword().equals(passwordEncoder.encode(updateUserRequest.getCurrentPassword()))) {
+			if(!updateUserRequest.getCurrentPassword().equals("")&passwordEncoder.matches(updateUserRequest.getCurrentPassword(),user.get().getPassword())) {
 				user.get().setPassword(passwordEncoder.encode(updateUserRequest.getNewPassword()));
-			}
-			else {
-				response.setStatusCode(404);
-				response.setMsg("Mật khẩu hiện tại không khớp ");
-			}
 				UserRepo.save(user.get());
 				response.setStatusCode(200);
 				response.setMsg("Cập nhật thành công");
+			}
+			else if(!updateUserRequest.getCurrentPassword().equals("")&!passwordEncoder.matches(updateUserRequest.getCurrentPassword(),user.get().getPassword())){
+				response.setStatusCode(404);
+				response.setMsg("Mật khẩu hiện tại không khớp ");
+				return response;
+ 
+			}
+			else {
+				UserRepo.save(user.get());
+				response.setStatusCode(200);
+				response.setMsg("Cập nhật thành công");
+			}
 		}		
 		else {
 			response.setStatusCode(404);

@@ -15,7 +15,7 @@ public class UserResponse {
 	public String phone;
 	public String email;
     public String image;
-     String role;
+    public String role;
     public String ngaysinh;
     public String sex;
     int StatusCode;
