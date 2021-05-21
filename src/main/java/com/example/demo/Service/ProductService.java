@@ -1,8 +1,8 @@
 package com.example.demo.Service;
 
-import java.util.List;
 import java.util.Optional;
 
+import com.example.demo.DTO.CommentResponse;
 import com.example.demo.DTO.ProductsResponse;
 import com.example.demo.model.CommentModel;
 import com.example.demo.model.ProductModel;
@@ -15,7 +15,7 @@ public interface ProductService {
 	ProductsResponse getProductByCategory(String category, int sort, long max, long min, String Type, int page);
 	ProductsResponse getProductByTitle(String search,int page, int sort, long max, long min);
 	ProductModel addComment(CommentModel commentModel, String id);
-	List<CommentModel> getComment(String id);
+	CommentResponse getComment(String id, int page);
 	ProductModel addReply(ReplyModel replyModel, String id, String idComment);
 }
 	

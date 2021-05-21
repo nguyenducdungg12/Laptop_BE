@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.DTO.CommentResponse;
 import com.example.demo.DTO.ProductsResponse;
 import com.example.demo.Service.ProductService;
 import com.example.demo.model.CommentModel;
@@ -71,8 +71,8 @@ public class ProductController {
 		return ResponseEntity.ok(productModel);
 	}
 	@GetMapping("/api/detailproducts/{id}/comment")
-	public ResponseEntity<?> getComment(@PathVariable("id") String id){
-		List<CommentModel> productModel = productService.getComment(id);
+	public ResponseEntity<?> getComment(@PathVariable("id") String id,@RequestParam(defaultValue = "1",name="page") int page){
+		CommentResponse productModel = productService.getComment(id,page);
 		return ResponseEntity.ok(productModel);
 	}
 

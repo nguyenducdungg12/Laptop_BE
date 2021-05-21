@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.DTO.CommentResponse;
 import com.example.demo.DTO.ProductsResponse;
 import com.example.demo.DTO.UserResponse;
 import com.example.demo.Repository.CommentRepo;
@@ -30,7 +31,8 @@ public class ProductServiceImpl implements ProductService {
 	ProductsResponse productResponse;
 	@Autowired
 	AuthService authService;
-	
+	@Autowired
+	CommentResponse commentResponse;
 	@Override
 	public ProductsResponse getAllProduct(int page,int sort,long max,long min) {
 		List<ProductModel> ListProduct;
@@ -222,9 +224,32 @@ public class ProductServiceImpl implements ProductService {
 		return Products.save(product);
 	}
 	@Override
-	public List<CommentModel> getComment(String id) {
+	public CommentResponse getComment(String id,int page) {
 		ProductModel product = Products.findById(id).get();
-		return product.getComment();
+		
+		if(page==1) {
+			if(product.getComment().size()<10) {
+				commentResponse.setListComment(product.getComment().subList(0, product.getComment().size()));
+				commentResponse.setCommentPerPage(product.getComment().size());
+			}
+			else {				
+				commentResponse.setListComment(product.getComment().subList(0, 9));
+				commentResponse.setCommentPerPage(10);
+
+			}
+		}else {
+			if(product.getComment().size()<(page)*10) {
+				commentResponse.setListComment(product.getComment().subList((page-1)*10, product.getComment().size()));
+				commentResponse.setCommentPerPage(product.getComment().size()%10);
+			}
+			else {
+				commentResponse.setListComment(product.getComment().subList((page-1)*10,(page+1)*10));
+				commentResponse.setCommentPerPage(10);
+			}
+		}
+		commentResponse.setTotalComment(product.getComment().size());
+		commentResponse.setTotalPage((product.getComment().size()/10)+1);
+		return commentResponse;
 	}
 	int findCommentInProduct(CommentModel commentModel,List<CommentModel> listComment) {
 		int temp=-1;
