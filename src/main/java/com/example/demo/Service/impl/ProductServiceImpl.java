@@ -1,5 +1,6 @@
 package com.example.demo.Service.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -10,16 +11,26 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.DTO.ProductsResponse;
+import com.example.demo.DTO.UserResponse;
+import com.example.demo.Repository.CommentRepo;
 import com.example.demo.Repository.ProductRepo;
+import com.example.demo.Service.AuthService;
 import com.example.demo.Service.ProductService;
+import com.example.demo.model.CommentModel;
 import com.example.demo.model.ProductModel;
+import com.example.demo.model.ReplyModel;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 	@Autowired
 	ProductRepo Products;
 	@Autowired
+	CommentRepo CommentRepo;
+	@Autowired
 	ProductsResponse productResponse;
+	@Autowired
+	AuthService authService;
+	
 	@Override
 	public ProductsResponse getAllProduct(int page,int sort,long max,long min) {
 		List<ProductModel> ListProduct;
@@ -191,6 +202,74 @@ public class ProductServiceImpl implements ProductService {
 		productResponse.setProductPerPage(15);
 		return productResponse;
 	}
+	@Override
+	public ProductModel addComment(CommentModel commentModel,String id) {
+		UserResponse user = authService.getUserCurrent();
+		ProductModel product = Products.findById(id).get();
+		commentModel.setCreateBy(new Date());
+		commentModel.setUser(user);
+		List<CommentModel> ListComment = product.getComment();
+		CommentModel comment = CommentRepo.save(commentModel);
+		if(ListComment!=null) {
+			ListComment.add(comment);
+		}
+		else {
+			List<CommentModel> temp = new ArrayList<CommentModel>();
+			temp.add(comment);
+			ListComment = temp;
+		}
+		product.setComment(ListComment);
+		return Products.save(product);
+	}
+	@Override
+	public List<CommentModel> getComment(String id) {
+		ProductModel product = Products.findById(id).get();
+		return product.getComment();
+	}
+	int findCommentInProduct(CommentModel commentModel,List<CommentModel> listComment) {
+		int temp=-1;
+		for(int i=0;i<listComment.size();i++) {
+			if(commentModel.getId().equals(listComment.get(i).getId())) {
+				return i;
+			}
+		}
+		return temp;
+	}
+	@Override
+	public ProductModel addReply(ReplyModel replyModel, String id, String idComment) {
+		UserResponse user = authService.getUserCurrent();
+		ProductModel product = Products.findById(id).get();
+		CommentModel comment = CommentRepo.findById(idComment).get();
+		replyModel.setCreateBy(new Date());
+		replyModel.setUser(user);
+		List<ReplyModel> ListReply = comment.getReply();
+		if(ListReply!=null) {
+			ListReply.add(replyModel);
+		}
+		else {
+			List<ReplyModel> temp = new ArrayList<ReplyModel>();
+			temp.add(replyModel);
+			ListReply = temp;
+		}
+		comment.setReply(ListReply);
+		CommentModel commentModel = CommentRepo.save(comment);
+		List<CommentModel> ListComment = product.getComment();
+			if(ListComment!=null) {
+				int index = findCommentInProduct(commentModel,ListComment);
 
-
+				if(index!=-1) {
+					ListComment.set(index, commentModel);
+				}
+				else {
+					ListComment.add(commentModel);
+				}
+			}
+			else {
+				List<CommentModel> temp = new ArrayList<CommentModel>();
+				temp.add(commentModel);
+				ListComment = temp;
+			}
+			product.setComment(ListComment);
+			return Products.save(product);	
 }
+	}

@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.DTO.ProductsResponse;
 import com.example.demo.Service.ProductService;
+import com.example.demo.model.CommentModel;
 import com.example.demo.model.ProductModel;
+import com.example.demo.model.ReplyModel;
 @RestController
 public class ProductController {
 	@Autowired
@@ -50,7 +52,6 @@ public class ProductController {
 	}
 	@PostMapping("/api/product")
 	public ResponseEntity<?> postProduct(@RequestBody ProductModel product){
-		System.out.print(product);
 		try {
 			productService.addProduct(product);			
 		}
@@ -59,4 +60,20 @@ public class ProductController {
 		}
 		return ResponseEntity.ok(product);
 	}
+	@PostMapping("/api/detailproducts/{id}/comment")
+	public ResponseEntity<?> postComment(@PathVariable("id") String id,@RequestBody CommentModel commentModel){
+		ProductModel productModel = productService.addComment(commentModel,id);
+		return ResponseEntity.ok(productModel);
+	}
+	@PostMapping("/api/detailproducts/{idProduct}/reply/{idComment}")
+	public ResponseEntity<?> postReply(@PathVariable("idProduct") String id,@PathVariable("idComment") String idComment,@RequestBody ReplyModel replyModel){
+		ProductModel productModel = productService.addReply(replyModel,id,idComment);
+		return ResponseEntity.ok(productModel);
+	}
+	@GetMapping("/api/detailproducts/{id}/comment")
+	public ResponseEntity<?> getComment(@PathVariable("id") String id){
+		List<CommentModel> productModel = productService.getComment(id);
+		return ResponseEntity.ok(productModel);
+	}
+
 }

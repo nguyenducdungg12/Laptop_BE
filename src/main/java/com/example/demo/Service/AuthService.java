@@ -16,6 +16,7 @@ import com.example.demo.DTO.RegisterRequest;
 import com.example.demo.DTO.UpdatedUserRequest;
 import com.example.demo.DTO.UserResponse;
 import com.example.demo.model.OrderModel;
+import com.example.demo.model.UserModel;
 
 public interface AuthService {
 	LoginResponse Login(LoginRequest loginRequest);
@@ -28,5 +29,6 @@ public interface AuthService {
 	OrderResponse deleteOrder(String id);
 	OrderResponse cancelOrder(String id);
 	OrderResponse updatedUser(UpdatedUserRequest updateUserRequest, MultipartFile multipartFile);
+	UserModel userDetail();
 }
 

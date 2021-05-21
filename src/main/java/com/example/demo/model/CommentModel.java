@@ -1,6 +1,12 @@
 package com.example.demo.model;
 
+import java.util.Date;
 import java.util.List;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import com.example.demo.DTO.UserResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,8 +16,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentModel {
-	UserModel user;
+	@Id
+	public String id;
+	UserResponse user;
 	String content;
 	int start;
-	List<UserModel> reply;
+	@Field("createdBy")
+	public Date createBy;
+	List<ReplyModel> reply;
 }

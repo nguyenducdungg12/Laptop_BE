@@ -283,13 +283,13 @@ public class AuthServiceImpl implements AuthService {
 				}
 				user.get().setImage("http://localhost:8080/image/"+fileName);
 			}
-			if(!updateUserRequest.getCurrentPassword().equals("")&passwordEncoder.matches(updateUserRequest.getCurrentPassword(),user.get().getPassword())) {
+			if(!updateUserRequest.getCurrentPassword().equals("")&&passwordEncoder.matches(updateUserRequest.getCurrentPassword(),user.get().getPassword())) {
 				user.get().setPassword(passwordEncoder.encode(updateUserRequest.getNewPassword()));
 				UserRepo.save(user.get());
 				response.setStatusCode(200);
 				response.setMsg("Cập nhật thành công");
 			}
-			else if(!updateUserRequest.getCurrentPassword().equals("")&!passwordEncoder.matches(updateUserRequest.getCurrentPassword(),user.get().getPassword())){
+			else if(!updateUserRequest.getCurrentPassword().equals("")&&!passwordEncoder.matches(updateUserRequest.getCurrentPassword(),user.get().getPassword())){
 				response.setStatusCode(404);
 				response.setMsg("Mật khẩu hiện tại không khớp ");
 				return response;
@@ -306,6 +306,10 @@ public class AuthServiceImpl implements AuthService {
 			response.setMsg("Có lỗi xảy ra ");
 		}
 		return response;
+	}
+	@Override
+	public UserModel userDetail() {
+		return UserRepo.findByEmail(getUserCurrent().getEmail()).get();
 	}
 	
 	

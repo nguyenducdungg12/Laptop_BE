@@ -34,8 +34,9 @@ public class ProductModel  {
 	@Field(value="content")
 	public String content;
 	@Field(value="type")
-	public int type;
+	public String type;
 	@Field(value="ListImage")
 	List<String> ListImage;
-
+	@Field(value="comment")
+	List<CommentModel> comment;
 }
