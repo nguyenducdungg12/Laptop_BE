@@ -98,8 +98,7 @@ public class AuthController {
 }
 	@PostMapping("/forgot/{token}")
 	public ResponseEntity<?> forgotPasswordChange(@PathVariable("token") String token,@RequestBody ForgotPasswordRequest request ) {
-		System.out.println(request);
-		System.out.println(token);
+
 
 		ForgotPasswordResponse response = new ForgotPasswordResponse();
 			if(tokenProvider.validateToken(token)) {
@@ -128,8 +127,19 @@ public class AuthController {
 	@DeleteMapping("/order")
 	public OrderResponse deleteOrder(@RequestBody OrderModel ordermodel){
 		return authService.deleteOrder(ordermodel.getId());
+		
 	}
+	@GetMapping("/orders")
+	public ResponseEntity<?> getAllOrder(){
+		UserResponse currentUser = authService.getUserCurrent();
+		if(currentUser.getRole().equals("ADMIN")) {			
+			return ResponseEntity.ok(authService.getAllOrder());
+		}
+		else {
+			return ResponseEntity.status(404).body("Không có quyền truy cập");
+		}
 
+	}
 	@PostMapping("/user/update")
 	public OrderResponse updateUser(@ModelAttribute UpdatedUserRequest updateUserRequest,@RequestParam(value="image",required = false) MultipartFile multipartFile) throws IOException{		
 		return authService.updatedUser(updateUserRequest,multipartFile);
@@ -138,6 +148,33 @@ public class AuthController {
 	public ResponseEntity<?> getUser() {
 		UserResponse userResponse = authService.getUserCurrent();
 		return ResponseEntity.ok(userResponse);
+	}
+	@GetMapping("/users")
+	public ResponseEntity<?> getUsers() {
+		UserResponse currentUser = authService.getUserCurrent();
+		if(currentUser.getRole().equals("ADMIN")) {			
+			return ResponseEntity.ok(userService.findAll());
+		}
+		else {
+			return ResponseEntity.status(404).body("Không có quyền truy cập");
+		}
+	}
+	@DeleteMapping("/user")
+	public ResponseEntity<?> deleteUser(@RequestBody String id){
+		UserResponse currentUser = authService.getUserCurrent();
+		if(currentUser.getRole().equals("ADMIN")) {			
+
+			try {
+				userService.deleteUser(id);
+				return ResponseEntity.ok("Thành công");		
+			}
+			catch(Exception err) {
+				return ResponseEntity.status(404).body(err);
+			}
+		}
+		else {
+			return ResponseEntity.status(404).body("Không có quyền truy cập");
+		}
 	}
 	@GetMapping("/accountVerification/{vertificationcode}")
 	public ResponseEntity<?> vertificationUser(@PathVariable("vertificationcode") String vertificationcode){

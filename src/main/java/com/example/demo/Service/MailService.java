@@ -26,11 +26,7 @@ public class MailService {
 		String fromAddress = "nguyenducdungg121@gmail.com";
 		String senderName = "Dũng Pro";
 		String subject = "Kích hoạt tài khoản của bạn";
-		String content = "Kính gửi [[name]],<br>"
-				+ "Nhấn vào link bên dưới để kích hoạt tài khoản của bạn:<br>"
-				+ "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
-				+ "Thank you,<br>"
-				+ "Your company name.";
+		String content = "<div style='max-width: 700px; margin:auto; border: 10px solid #ddd; padding: 50px 20px; font-size: 110%;text-align:center;'><h2 style='text-align: center; text-transform: uppercase;color: teal;'>Chào mừng bạn đến với Laptop G21.</h2><p>Chúc mừng bạn đã đăng ký thành công tài khoản tại Laptop G21.Chỉ còn 1 bước cuối cùng để kích hoạt tài khoản, Click nút phía bên dưới để xác nhận tài khoản.</p><a href=[[URL]] style='background: crimson; text-decoration: none; color: white; padding: 10px 20px; margin: 10px 0; display: inline-block;border-radius:0.5rem;font-weight: bold;box-shadow:0 3px 6px crimson;text-transform: uppercase'>VERIFY</a> <div></div></div>";
 		MimeMessage message = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message);
 		

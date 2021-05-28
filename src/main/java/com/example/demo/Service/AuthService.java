@@ -30,5 +30,6 @@ public interface AuthService {
 	OrderResponse cancelOrder(String id);
 	OrderResponse updatedUser(UpdatedUserRequest updateUserRequest, MultipartFile multipartFile);
 	UserModel userDetail();
+	List<OrderModel> getAllOrder();
 }
 

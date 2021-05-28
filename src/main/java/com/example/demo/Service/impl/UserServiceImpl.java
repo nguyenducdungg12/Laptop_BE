@@ -45,5 +45,11 @@ public class UserServiceImpl implements UserService,UserDetailsService {
 	public Optional<UserModel> findByVerificationcode(String verificationcode) {
 			return UserRepo.findByVerificationcode(verificationcode);
 	}
+
+	@Override
+	public void deleteUser(String id) {
+		
+		UserRepo.deleteById(id);
+	}
 	
 }

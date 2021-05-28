@@ -18,6 +18,8 @@ public class UserResponse {
     public String role;
     public String ngaysinh;
     public String sex;
+    public boolean enable;
+    public String id;
     int StatusCode;
     
 }

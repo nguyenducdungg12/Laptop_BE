@@ -1,19 +1,26 @@
 package com.example.demo.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.DTO.CommentResponse;
+import com.example.demo.DTO.ProductRequest;
 import com.example.demo.DTO.ProductsResponse;
+import com.example.demo.Repository.ProductRepo;
 import com.example.demo.Service.ProductService;
 import com.example.demo.model.CommentModel;
 import com.example.demo.model.ProductModel;
@@ -22,7 +29,13 @@ import com.example.demo.model.ReplyModel;
 public class ProductController {
 	@Autowired
 	ProductService productService;
+	@Autowired
+	ProductRepo Products;
 	
+	@GetMapping("/api/admin/products")
+	public ResponseEntity<?> getAllProductsAdmin(@RequestParam(defaultValue = "1",name="page") int page,@RequestParam(defaultValue = "0",name="sort") int sort,@RequestParam(defaultValue = "0",name="max") long max,@RequestParam(defaultValue = "0",name="min",required = false) long min,@RequestParam(defaultValue = "",name="search") String search){
+		return ResponseEntity.ok(Products.findAll());
+	}
 	@GetMapping("/api/products")
 	public ResponseEntity<?> getAllProducts(@RequestParam(defaultValue = "1",name="page") int page,@RequestParam(defaultValue = "0",name="sort") int sort,@RequestParam(defaultValue = "0",name="max") long max,@RequestParam(defaultValue = "0",name="min",required = false) long min,@RequestParam(defaultValue = "",name="search") String search){
 		ProductsResponse listProduct;
@@ -51,14 +64,32 @@ public class ProductController {
 		}
 	}
 	@PostMapping("/api/product")
-	public ResponseEntity<?> postProduct(@RequestBody ProductModel product){
+	public ResponseEntity<?> postProduct(@ModelAttribute ProductRequest product,@RequestParam(value="image",required = false) MultipartFile multipartFile,@RequestParam(value="listimage",required = false) List<MultipartFile> multipartFiles){
 		try {
-			productService.addProduct(product);			
+			return ResponseEntity.ok(productService.addProduct(product,multipartFile,multipartFiles));		
 		}
 		catch(Exception err) {
 			return ResponseEntity.status(404).body(err);
 		}
-		return ResponseEntity.ok(product);
+	}
+	@DeleteMapping("/api/product")
+	public ResponseEntity<?> deleteProduct(@RequestBody String id){
+		try {
+			productService.deleteProduct(id);
+			return ResponseEntity.ok("Thành công");		
+		}
+		catch(Exception err) {
+			return ResponseEntity.status(404).body(err);
+		}
+	}
+	@PutMapping("/api/product")
+	public ResponseEntity<?> updateProduct(@ModelAttribute ProductRequest product,@RequestParam(value="image",required = false) MultipartFile multipartFile,@RequestParam(value="listimage",required = false) List<MultipartFile> multipartFiles){
+		try {
+			return ResponseEntity.ok(productService.updateProduct(product,multipartFile,multipartFiles));		
+		}
+		catch(Exception err) {
+			return ResponseEntity.status(404).body(err);
+		}
 	}
 	@PostMapping("/api/detailproducts/{id}/comment")
 	public ResponseEntity<?> postComment(@PathVariable("id") String id,@RequestBody CommentModel commentModel){

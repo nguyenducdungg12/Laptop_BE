@@ -31,6 +31,8 @@ public class UserModel {
 	public String email;
 	@Field(value="image")
 	public String image;
+	@Field(value="listimage")
+	public List <String> listimage;
 	@Field(value="role")
 	public String role;
 	@Field(value="enable")

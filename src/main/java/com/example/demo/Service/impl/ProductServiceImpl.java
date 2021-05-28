@@ -1,5 +1,11 @@
 package com.example.demo.Service.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -9,10 +15,13 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.DTO.CommentResponse;
+import com.example.demo.DTO.ProductRequest;
 import com.example.demo.DTO.ProductsResponse;
 import com.example.demo.DTO.UserResponse;
+import com.example.demo.Exception.CustomException;
 import com.example.demo.Repository.CommentRepo;
 import com.example.demo.Repository.ProductRepo;
 import com.example.demo.Service.AuthService;
@@ -82,10 +91,101 @@ public class ProductServiceImpl implements ProductService {
 		return productResponse;
 		
 	}
-	public ProductModel addProduct(ProductModel product) {
-		product.setCreateBy(new Date());
-		product.setUpdatedBy(new Date());
-		return Products.save(product);
+	public ProductModel addProduct(ProductRequest product, MultipartFile image, List<MultipartFile> listimage) {
+		ProductModel newProduct = new ProductModel();
+		newProduct.setCategory(product.getCategory());
+		newProduct.setTitle(product.getTitle());
+		newProduct.setNewprice(product.getNewprice());
+		newProduct.setOldprice(product.getOldprice());
+		newProduct.setContent(product.getContent());
+		newProduct.setType(product.getType());
+
+		if(image!=null) {					
+			String fileName = image.getOriginalFilename();
+	        Path uploadPath = Paths.get("src/main/resources/static/image/product");
+			try {
+				InputStream inputStream = image.getInputStream();
+	            Path filePath = uploadPath.resolve(fileName);
+	            Files.copy(inputStream, filePath,StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				 new CustomException(e.getLocalizedMessage());
+			}
+			newProduct.setImage("http://localhost:8080/image/product/"+fileName);
+		}
+		if(listimage!=null) {
+			for(int i=0;i<listimage.size();i++) {
+				String fileName = listimage.get(i).getOriginalFilename();
+		        Path uploadPath = Paths.get("src/main/resources/static/image/product/");
+				try {
+					InputStream inputStream = listimage.get(i).getInputStream();
+		            Path filePath = uploadPath.resolve(fileName);
+		            Files.copy(inputStream, filePath,StandardCopyOption.REPLACE_EXISTING);
+				} catch (IOException e) {
+					 new CustomException(e.getLocalizedMessage());
+				}
+				if(newProduct.getListImage()==null) {
+					List<String> temp = new ArrayList<String>();
+					temp.add("http://localhost:8080/image/product/"+fileName);
+					newProduct.setListImage(temp);
+				}
+				else {
+					newProduct.getListImage().add("http://localhost:8080/image/product/"+fileName);
+				}
+			
+
+			}
+		}
+		newProduct.setCreateBy(new Date());
+		newProduct.setUpdatedBy(new Date());
+		return Products.save(newProduct);
+	}
+	@Override
+	public ProductModel updateProduct(ProductRequest product, MultipartFile image,List<MultipartFile> listimage) {
+		ProductModel ListProduct = Products.findById(product.getId()).get();
+		if(ListProduct!=null) {
+			ListProduct.setCategory(product.getCategory());
+			ListProduct.setTitle(product.getTitle());
+			ListProduct.setNewprice(product.getNewprice());
+			ListProduct.setOldprice(product.getOldprice());
+			ListProduct.setType(product.getType());
+			if(image!=null) {					
+				String fileName = image.getOriginalFilename();
+		        Path uploadPath = Paths.get("src/main/resources/static/image/product");
+				try {
+					InputStream inputStream = image.getInputStream();
+		            Path filePath = uploadPath.resolve(fileName);
+		            Files.copy(inputStream, filePath,StandardCopyOption.REPLACE_EXISTING);
+				} catch (IOException e) {
+					 new CustomException(e.getLocalizedMessage());
+				}
+				ListProduct.setImage("http://localhost:8080/image/product/"+fileName);
+			}
+			if(listimage!=null) {
+				for(int i=0;i<listimage.size();i++) {
+					String fileName = listimage.get(i).getOriginalFilename();
+			        Path uploadPath = Paths.get("src/main/resources/static/image/product/");
+					try {
+						InputStream inputStream = listimage.get(i).getInputStream();
+			            Path filePath = uploadPath.resolve(fileName);
+			            Files.copy(inputStream, filePath,StandardCopyOption.REPLACE_EXISTING);
+					} catch (IOException e) {
+						 new CustomException(e.getLocalizedMessage());
+					}
+					if(ListProduct.getListImage()==null) {
+						List<String> temp = new ArrayList<String>();
+						temp.add("http://localhost:8080/image/product/"+fileName);
+						ListProduct.setListImage(temp);
+					}
+					else {
+						ListProduct.getListImage().add("http://localhost:8080/image/product/"+fileName);
+					}
+				
+				}
+			}
+			ListProduct.setUpdatedBy(new Date());
+			Products.save(ListProduct);
+		}
+		return ListProduct;
 	}
 	@Override
 	public Optional<ProductModel> findProductById(String id) {
@@ -226,29 +326,39 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public CommentResponse getComment(String id,int page) {
 		ProductModel product = Products.findById(id).get();
-		
-		if(page==1) {
-			if(product.getComment().size()<10) {
-				commentResponse.setListComment(product.getComment().subList(0, product.getComment().size()));
-				commentResponse.setCommentPerPage(product.getComment().size());
-			}
-			else {				
-				commentResponse.setListComment(product.getComment().subList(0, 9));
-				commentResponse.setCommentPerPage(10);
 
-			}
-		}else {
-			if(product.getComment().size()<(page)*10) {
-				commentResponse.setListComment(product.getComment().subList((page-1)*10, product.getComment().size()));
-				commentResponse.setCommentPerPage(product.getComment().size()%10);
-			}
-			else {
-				commentResponse.setListComment(product.getComment().subList((page-1)*10,(page+1)*10));
-				commentResponse.setCommentPerPage(10);
-			}
+		if(product.getComment()==null) {
+			commentResponse.setListComment(new ArrayList<CommentModel>());
+			commentResponse.setCommentPerPage(0);
+			commentResponse.setTotalComment(0);
+			commentResponse.setTotalPage(0);
 		}
-		commentResponse.setTotalComment(product.getComment().size());
-		commentResponse.setTotalPage((product.getComment().size()/10)+1);
+		else {
+			if(page==1) {
+				if(product.getComment().size()<10) {
+					commentResponse.setListComment(product.getComment().subList(0, product.getComment().size()));
+									
+						commentResponse.setCommentPerPage(product.getComment().size());
+				}
+				else {				
+					commentResponse.setListComment(product.getComment().subList(0, 9));
+					commentResponse.setCommentPerPage(10);
+
+				}
+			}else {
+				if(product.getComment().size()<(page)*10) {
+					commentResponse.setListComment(product.getComment().subList((page-1)*10, product.getComment().size()));
+					commentResponse.setCommentPerPage(product.getComment().size()%10);
+				}
+				else {
+					commentResponse.setListComment(product.getComment().subList((page-1)*10,(page+1)*10));
+					commentResponse.setCommentPerPage(10);
+				}
+			}
+			commentResponse.setTotalComment(product.getComment().size());
+			commentResponse.setTotalPage((product.getComment().size()/10)+1);
+		}
+	
 		return commentResponse;
 	}
 	int findCommentInProduct(CommentModel commentModel,List<CommentModel> listComment) {
@@ -297,4 +407,9 @@ public class ProductServiceImpl implements ProductService {
 			product.setComment(ListComment);
 			return Products.save(product);	
 }
+	@Override
+	public void deleteProduct(String id) {
+		 Products.deleteById(id);
 	}
+	}
+	

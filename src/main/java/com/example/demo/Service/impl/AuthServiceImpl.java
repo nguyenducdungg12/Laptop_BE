@@ -22,7 +22,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.DTO.ForgotPasswordResponse;
@@ -34,6 +33,7 @@ import com.example.demo.DTO.RegisterRequest;
 import com.example.demo.DTO.UpdatedUserRequest;
 import com.example.demo.DTO.UserResponse;
 import com.example.demo.Exception.CustomException;
+import com.example.demo.Repository.OrderRepo;
 import com.example.demo.Repository.UserRepo;
 import com.example.demo.Service.AuthService;
 import com.example.demo.Service.MailService;
@@ -54,7 +54,8 @@ public class AuthServiceImpl implements AuthService {
 	    
 		@Autowired
 		PasswordEncoder passwordEncoder;
-	    
+		@Autowired
+		OrderRepo orderRepo;
 		@Autowired
 		UserRepo UserRepo;
 		
@@ -193,10 +194,9 @@ public class AuthServiceImpl implements AuthService {
 			else {
 				order = user.get().getOrders();
 			}
-			orderModel.setId(UUID.randomUUID().toString());
 			orderModel.setTotalPrice(getTotalPrice(orderRequest.getProducts()));
-			order.add(orderModel);
-			
+			OrderModel temp = orderRepo.save(orderModel);
+			order.add(temp);	
 			user.get().setOrders(order);
 			UserRepo.save(user.get());
 			response.setMsg("Đặt hàng thành công");
@@ -220,7 +220,8 @@ public class AuthServiceImpl implements AuthService {
 		UserResponse userReponse = getUserCurrent();
 		Optional<UserModel> user= UserRepo.findByUsername(userReponse.getUsername());
 		if(user.isPresent()) {
-			List <OrderModel>order = user.get().getOrders();
+			List <OrderModel> order = user.get().getOrders();
+			orderRepo.deleteById(id);
 			for(int i=0;i<order.size();i++) {
 				if(order.get(i).getId().equals(id)) {
 					order.remove(i);
@@ -245,6 +246,10 @@ public class AuthServiceImpl implements AuthService {
 		Optional<UserModel> user= UserRepo.findByUsername(userReponse.getUsername());
 		if(user.isPresent()) {
 			List <OrderModel>order = user.get().getOrders();
+			OrderModel temp = orderRepo.findById(id).get();
+			temp.setCancelreason("0");
+			orderRepo.save(temp);
+			System.out.println(orderRepo.findById(id).get());
 			for(int i=0;i<order.size();i++) {
 				if(order.get(i).getId().equals(id)) {
 					order.get(i).setCancelreason("0");
@@ -310,6 +315,10 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public UserModel userDetail() {
 		return UserRepo.findByEmail(getUserCurrent().getEmail()).get();
+	}
+	@Override
+	public List<OrderModel> getAllOrder() {
+		return orderRepo.findAll();
 	}
 	
 	
