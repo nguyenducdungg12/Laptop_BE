@@ -23,6 +23,8 @@ public class UserModel {
 	public Date updatedBy;
 	@Field(value = "username")
 	public String username;
+	@Field(value = "name")
+	public String name;
 	@Field(value = "password")
 	public String password;
 	@Field(value = "phone")
@@ -45,6 +47,4 @@ public class UserModel {
     public String ngaysinh;
 	@Field(value="sex")
     public String sex;
-	@Field(value="order")
-	List<OrderModel> orders;
 }

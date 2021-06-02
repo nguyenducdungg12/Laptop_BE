@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -34,12 +33,14 @@ import com.example.demo.DTO.UpdatedUserRequest;
 import com.example.demo.DTO.UserResponse;
 import com.example.demo.Exception.CustomException;
 import com.example.demo.Repository.OrderRepo;
+import com.example.demo.Repository.ProductRepo;
 import com.example.demo.Repository.UserRepo;
 import com.example.demo.Service.AuthService;
 import com.example.demo.Service.MailService;
 import com.example.demo.model.CustomUserDetails;
 import com.example.demo.model.OrderModel;
 import com.example.demo.model.OrderProduct;
+import com.example.demo.model.ProductModel;
 import com.example.demo.model.UserModel;
 import com.example.demo.security.JwtTokenProvider;
 
@@ -58,13 +59,15 @@ public class AuthServiceImpl implements AuthService {
 		OrderRepo orderRepo;
 		@Autowired
 		UserRepo UserRepo;
-		
+		@Autowired
+		ProductRepo Products;
 		@Autowired
 		MailService mailService;
 		
 		public LoginResponse Login(LoginRequest loginRequest) {
 		Authentication authentication;
 		LoginResponse loginResponse =new LoginResponse();
+		System.out.println(loginRequest);
 		try {	
 			 authentication = authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(
@@ -104,9 +107,11 @@ public class AuthServiceImpl implements AuthService {
 			userResponse.setPhone(user.get().getPhone());
 			userResponse.setRole(user.get().getRole());
 			userResponse.setUsername(user.get().getUsername());
+			userResponse.setName(user.get().getName());
 			userResponse.setNgaysinh(user.get().getNgaysinh());
 			userResponse.setSex(user.get().getSex());
 			userResponse.setStatusCode(200);
+			userResponse.setId(user.get().getId());
 			return userResponse;
 		}
 		catch(Exception e) {
@@ -129,6 +134,7 @@ public class AuthServiceImpl implements AuthService {
 		UserModel newUser = new UserModel();
 		newUser.setUsername(registerRequest.getUsername());
 		newUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+		newUser.setName(registerRequest.getUsername());
 		newUser.setPhone(registerRequest.getPhone());
 		newUser.setEmail(registerRequest.getEmail());
 		newUser.setRole("USER");
@@ -140,6 +146,31 @@ public class AuthServiceImpl implements AuthService {
 		newUser.setEnable(false);
 		UserRepo.save(newUser);
 		mailService.sendVerificationEmail(newUser,"http://localhost:8080");
+	}
+	@Override
+	public void registerUserFB(RegisterRequest registerRequest) {
+		  Optional<UserModel> isEmailValid  = UserRepo.findByEmail(registerRequest.getEmail());
+		  if(isEmailValid.isPresent()) {
+			  if(isEmailValid.get().getUsername().equals(registerRequest.getUsername())) {
+				  return;
+			  }
+			  else {
+				  throw new CustomException("Email đã được sử dụng");
+
+			  }
+		  }else {
+			UserModel newUser = new UserModel();
+			newUser.setUsername(registerRequest.getUsername());
+			newUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+			newUser.setName(registerRequest.getName());
+			newUser.setEmail(registerRequest.getEmail());
+			newUser.setRole("USER");
+			newUser.setCreateBy(new Date());
+			newUser.setUpdatedBy(new Date());
+			newUser.setImage(registerRequest.getImage());
+			newUser.setEnable(true);
+			UserRepo.save(newUser);
+			}
 	}
 	@Override
 	public ForgotPasswordResponse forgotPassword(String email) throws UnsupportedEncodingException, MessagingException {
@@ -186,19 +217,10 @@ public class AuthServiceImpl implements AuthService {
 			orderModel.setPayment(orderRequest.getPayment());
 			orderModel.setProducts(orderRequest.getProducts());;
 			orderModel.setTimeorder(new Date());
-			orderModel.setStatus_order(false);
-			List <OrderModel> order;	
-			if(user.get().getOrders()==null) {
-				order = new ArrayList<OrderModel>();
-			}
-			else {
-				order = user.get().getOrders();
-			}
+			orderModel.setStatus_order(false);	
 			orderModel.setTotalPrice(getTotalPrice(orderRequest.getProducts()));
-			OrderModel temp = orderRepo.save(orderModel);
-			order.add(temp);	
-			user.get().setOrders(order);
-			UserRepo.save(user.get());
+			orderModel.setIdUser(user.get().id);
+			orderRepo.save(orderModel);
 			response.setMsg("Đặt hàng thành công");
 			response.setStatusCode(200);
 		}
@@ -210,9 +232,8 @@ public class AuthServiceImpl implements AuthService {
 	}
 	@Override
 	public List<OrderModel> getOrder() {
-		UserResponse userReponse = getUserCurrent();
-		Optional<UserModel> user= UserRepo.findByUsername(userReponse.getUsername());		
-		return user.get().getOrders();
+		UserResponse userReponse = getUserCurrent();	
+		return orderRepo.findByIduser(userReponse.getId());
 	}
 	@Override
 	public OrderResponse deleteOrder(String id) {
@@ -220,16 +241,7 @@ public class AuthServiceImpl implements AuthService {
 		UserResponse userReponse = getUserCurrent();
 		Optional<UserModel> user= UserRepo.findByUsername(userReponse.getUsername());
 		if(user.isPresent()) {
-			List <OrderModel> order = user.get().getOrders();
 			orderRepo.deleteById(id);
-			for(int i=0;i<order.size();i++) {
-				if(order.get(i).getId().equals(id)) {
-					order.remove(i);
-					user.get().setOrders(order);
-					UserRepo.save(user.get());
-					break;
-				}
-			}
 			response.setStatusCode(200);
 			response.setMsg("Xóa đơn hàng thành công");
 		}
@@ -245,25 +257,40 @@ public class AuthServiceImpl implements AuthService {
 		UserResponse userReponse = getUserCurrent();
 		Optional<UserModel> user= UserRepo.findByUsername(userReponse.getUsername());
 		if(user.isPresent()) {
-			List <OrderModel>order = user.get().getOrders();
 			OrderModel temp = orderRepo.findById(id).get();
 			temp.setCancelreason("0");
 			orderRepo.save(temp);
-			System.out.println(orderRepo.findById(id).get());
-			for(int i=0;i<order.size();i++) {
-				if(order.get(i).getId().equals(id)) {
-					order.get(i).setCancelreason("0");
-					user.get().setOrders(order);
-					UserRepo.save(user.get());
-					break;
-				}
-			}
 			response.setStatusCode(200);
 			response.setMsg("Đã Hủy đơn hàng");
 		}
 		else {
 			response.setStatusCode(404);
 			response.setMsg("Hủy đơn hàng thất bại");
+		}
+		return response;
+	}
+	@Override
+	public OrderResponse acceptOrder(String id) {
+		OrderResponse response = new OrderResponse();
+		UserResponse userReponse = getUserCurrent();
+		Optional<UserModel> user= UserRepo.findByUsername(userReponse.getUsername());
+		if(user.isPresent()) {
+			OrderModel temp = orderRepo.findById(id).get();
+			for(int i=0 ;i<temp.getProducts().size();i++) {
+				OrderProduct orderProduct = temp.getProducts().get(i);
+				ProductModel modelProduct = Products.findById(orderProduct.getId()).get();
+				modelProduct.setQuantity(modelProduct.getQuantity()-orderProduct.getSoluong());
+				Products.save(modelProduct);
+				
+			}
+			temp.setStatus_order(true);
+			orderRepo.save(temp);
+			response.setStatusCode(200);
+			response.setMsg("Duyệt thành công đơn hàng");
+		}
+		else {
+			response.setStatusCode(404);
+			response.setMsg("Duyệt đơn hàng thất bại");
 		}
 		return response;
 	}
@@ -320,6 +347,8 @@ public class AuthServiceImpl implements AuthService {
 	public List<OrderModel> getAllOrder() {
 		return orderRepo.findAll();
 	}
+
+	
 	
 	
 	

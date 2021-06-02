@@ -99,6 +99,7 @@ public class ProductServiceImpl implements ProductService {
 		newProduct.setOldprice(product.getOldprice());
 		newProduct.setContent(product.getContent());
 		newProduct.setType(product.getType());
+		newProduct.setQuantity(product.getQuantity());
 
 		if(image!=null) {					
 			String fileName = image.getOriginalFilename();

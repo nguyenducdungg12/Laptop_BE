@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class UserResponse {
 	public String username;
 	public String phone;
+	public String name;
 	public String email;
     public String image;
     public String role;

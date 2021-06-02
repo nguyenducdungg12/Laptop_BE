@@ -33,6 +33,8 @@ public class ProductModel  {
 	public String category;
 	@Field(value="content")
 	public String content;
+	@Field(value="quantity")
+	public int quantity;
 	@Field(value="type")
 	public String type;
 	@Field(value="ListImage")

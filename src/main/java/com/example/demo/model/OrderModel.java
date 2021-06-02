@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @Data
 @Document(collection="Orders")
 public class OrderModel {
-
 	String id;
 	List<OrderProduct> products;	
 	String address;
@@ -22,5 +21,5 @@ public class OrderModel {
 	Date timeorder;
 	String cancelreason;
 	Boolean status_order;
-	
+	String idUser;
 }

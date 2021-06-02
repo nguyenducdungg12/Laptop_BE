@@ -31,5 +31,7 @@ public interface AuthService {
 	OrderResponse updatedUser(UpdatedUserRequest updateUserRequest, MultipartFile multipartFile);
 	UserModel userDetail();
 	List<OrderModel> getAllOrder();
+	OrderResponse acceptOrder(String id);
+	void registerUserFB(RegisterRequest registerRequest);
 }
 

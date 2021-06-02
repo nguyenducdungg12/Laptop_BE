@@ -16,4 +16,5 @@ public class ProductRequest {
 		public String category;
 		public String content;
 		public String type;
+		public int quantity;
 }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class OrderProduct {
-	public long soluong;
+	public int soluong;
 	public String id;
 	public Date createBy;
 	public Date updatedBy; 

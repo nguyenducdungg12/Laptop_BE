@@ -73,7 +73,20 @@ public class AuthController {
 		}
 		return registerResponse;
 	}
-	
+	@PostMapping("/register/facebook")
+	public RegisterResponse registerUserFB(@RequestBody RegisterRequest registerRequest){
+		RegisterResponse registerResponse = new RegisterResponse();
+		try {
+			authService.registerUserFB(registerRequest);
+			registerResponse.setStatusCode(200);
+			registerResponse.setMsg("Đăng nhập thành công");
+		}
+		catch(Exception e) {
+			registerResponse.setStatusCode(403);
+			registerResponse.setMsg(e.getLocalizedMessage());
+		}
+		return registerResponse;
+	}
 	@PostMapping("/login")
 	public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest){
 		LoginResponse loginResponse = authService.Login(loginRequest);
@@ -117,8 +130,25 @@ public class AuthController {
 		return authService.addOrder(orderRequest);	
 	}
 	@PostMapping("/order/cancel")
-	public OrderResponse cancelOrder(@RequestBody OrderModel ordermodel){
-		return authService.cancelOrder(ordermodel.getId());	
+	public ResponseEntity<?> cancelOrder(@RequestBody OrderModel ordermodel){
+		UserResponse currentUser = authService.getUserCurrent();
+		if(currentUser.getRole().equals("ADMIN")||currentUser.getId().equals(ordermodel.getId())) {			
+			return ResponseEntity.ok(authService.cancelOrder(ordermodel.getId()));	
+		}
+		else {
+			return ResponseEntity.status(404).body("Không có quyền truy cập");
+		}
+	}
+	@PostMapping("/order/accept")
+	public ResponseEntity<?> acceptOrder(@RequestBody OrderModel ordermodel){
+		UserResponse currentUser = authService.getUserCurrent();
+		if(currentUser.getRole().equals("ADMIN")) {			
+			return ResponseEntity.ok(authService.acceptOrder(ordermodel.getId()));	
+		}
+		else {
+			return ResponseEntity.status(404).body("Không có quyền truy cập");
+
+		}
 	}
 	@GetMapping("/order")
 	public List<OrderModel> getOrder(){
@@ -127,7 +157,6 @@ public class AuthController {
 	@DeleteMapping("/order")
 	public OrderResponse deleteOrder(@RequestBody OrderModel ordermodel){
 		return authService.deleteOrder(ordermodel.getId());
-		
 	}
 	@GetMapping("/orders")
 	public ResponseEntity<?> getAllOrder(){

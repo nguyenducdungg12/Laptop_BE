@@ -54,7 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		.antMatchers(HttpMethod.POST,"/api/uploadfile").permitAll()
 		.antMatchers(HttpMethod.GET,"/api/auth/user").permitAll()
 		.antMatchers(HttpMethod.GET,"/image/**").permitAll()
-		.antMatchers(HttpMethod.POST,"/api/auth/register").permitAll()
+		.antMatchers(HttpMethod.POST,"/api/auth/register/**").permitAll()
 		.antMatchers(HttpMethod.POST,"/api/auth/forgot/**").permitAll()
 		.antMatchers(HttpMethod.GET,"/api/auth/forgot/**").permitAll()
 		.antMatchers(HttpMethod.GET,"/api/auth/accountVerification/**").permitAll()
