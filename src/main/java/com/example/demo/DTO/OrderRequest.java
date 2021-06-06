@@ -15,4 +15,5 @@ public class OrderRequest {
 	String adress;
 	String payment;	
 	List<OrderProduct> products;
+	long price;
 }

@@ -219,33 +219,34 @@ public class ProductServiceImpl implements ProductService {
 			if(sort!=0){
 				Sort sorts = sort==1 ?  Sort.by(Sort.Direction.ASC,"newprice") : Sort.by(Sort.Direction.DESC,"newprice");
 				if(max!=0) {
-					ListProduct = Products.findByCategoryAndTypeRangeSortPK("laptop",Type,max, min,sorts);
+					ListProduct = Products.findByCategoryAndTypeRangeSortPK("Laptop",Type,max, min,sorts);
 				}
 				else {			
-					ListProduct = Products.findByCategoryAndTypeRangeSortGreatthan("laptop",Type,min,sorts);
+					ListProduct = Products.findByCategoryAndTypeRangeSortGreatthan("Laptop",Type,min,sorts);
 				}
 			}
 			else {
 				if(max!=0) {
-					ListProduct= Products.findByCategoryAndTypeRangeSortPK("laptop",Type,max,min,null);
+					ListProduct= Products.findByCategoryAndTypeRangeSortPK("Laptop",Type,max,min,null);
 
 				}
 				else {
-					ListProduct= Products.findByCategoryAndTypeRangeSortGreatthan("laptop",Type,min,null);
+					ListProduct= Products.findByCategoryAndTypeRangeSortGreatthan("Laptop",Type,min,null);
 					}
 				}
 		}
+		System.out.println(ListProduct.size());
 			if(page==1) {
 				if(ListProduct.size()<page*15) {
 					productResponse.setListProducts(ListProduct);
 				}
 				else {					
-					productResponse.setListProducts(ListProduct.subList(0, page*15-1));
+					productResponse.setListProducts(ListProduct.subList(0, page*15));
 				}
 			}
 			else {
 				if(ListProduct.size()<page*15) {
-					if((page+1)*15-ListProduct.size()>15) {
+					if((page)*15-ListProduct.size()>15) {
 						productResponse.setListProducts(Collections.emptyList());
 					}
 					else {
@@ -253,7 +254,7 @@ public class ProductServiceImpl implements ProductService {
 					}
 				}
 				else {					
-					productResponse.setListProducts(ListProduct.subList((page-1)*15, page*15-1));
+					productResponse.setListProducts(ListProduct.subList((page-1)*15, page*15));
 				}
 			}
 			productResponse.setTotalProduct(ListProduct.size());

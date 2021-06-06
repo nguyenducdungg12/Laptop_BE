@@ -25,6 +25,7 @@ public interface AuthService {
 	ForgotPasswordResponse forgotPassword(String email) throws UnsupportedEncodingException, MessagingException;
 	void changePassword(String password,String email);
 	OrderResponse addOrder(OrderRequest orderRequest);
+	OrderModel addOrderCheck(OrderRequest orderRequest);
 	List<OrderModel> getOrder();
 	OrderResponse deleteOrder(String id);
 	OrderResponse cancelOrder(String id);

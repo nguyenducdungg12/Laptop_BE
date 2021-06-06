@@ -231,6 +231,24 @@ public class AuthServiceImpl implements AuthService {
 		return response;
 	}
 	@Override
+	public OrderModel addOrderCheck(OrderRequest orderRequest) {
+		UserResponse userReponse = getUserCurrent();
+		Optional<UserModel> user= UserRepo.findByUsername(userReponse.getUsername());
+		if(user.isPresent()) {
+			OrderModel orderModel = new OrderModel();
+			orderModel.setAddress(orderRequest.getAdress());
+			orderModel.setPayment(orderRequest.getPayment());
+			orderModel.setProducts(orderRequest.getProducts());;
+			orderModel.setTimeorder(new Date());
+			orderModel.setStatus_order(false);	
+			orderModel.setTotalPrice(getTotalPrice(orderRequest.getProducts()));
+			orderModel.setIdUser(user.get().id);
+			return orderRepo.save(orderModel);
+			
+		}
+		return null;
+	}
+	@Override
 	public List<OrderModel> getOrder() {
 		UserResponse userReponse = getUserCurrent();	
 		return orderRepo.findByIduser(userReponse.getId());
@@ -347,6 +365,7 @@ public class AuthServiceImpl implements AuthService {
 	public List<OrderModel> getAllOrder() {
 		return orderRepo.findAll();
 	}
+
 
 	
 	
