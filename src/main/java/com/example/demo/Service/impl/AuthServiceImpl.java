@@ -321,6 +321,7 @@ public class AuthServiceImpl implements AuthService {
 			user.get().setPhone(updateUserRequest.getPhone());
 			user.get().setSex(updateUserRequest.getSex());
 			user.get().setNgaysinh(updateUserRequest.getNgaysinh());
+			user.get().setName(updateUserRequest.getName());
 			if(multipartFile!=null) {					
 				String fileName = multipartFile.getOriginalFilename();
 		        Path uploadPath = Paths.get("src/main/resources/static/image");

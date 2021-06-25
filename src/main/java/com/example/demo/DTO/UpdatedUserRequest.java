@@ -14,4 +14,5 @@ public class UpdatedUserRequest {
     public String sex;
     public String currentPassword;
     public String newPassword;
+    public String name;
 }
