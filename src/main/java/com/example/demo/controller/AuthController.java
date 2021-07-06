@@ -132,7 +132,7 @@ public class AuthController {
 	@PostMapping("/order/cancel")
 	public ResponseEntity<?> cancelOrder(@RequestBody OrderModel ordermodel){
 		UserResponse currentUser = authService.getUserCurrent();
-		if(currentUser.getRole().equals("ADMIN")||currentUser.getId().equals(ordermodel.getId())) {			
+		if(currentUser.getRole().equals("ADMIN")||currentUser.getId().equals(ordermodel.getIdUser())) {			
 			return ResponseEntity.ok(authService.cancelOrder(ordermodel.getId()));	
 		}
 		else {

@@ -178,7 +178,7 @@ public class AuthServiceImpl implements AuthService {
 		 Optional<UserModel> user = UserRepo.findByEmail(email);
 		 if(user.isPresent()) {
 			 user.get().setForgotpassword(tokenProvider.generateTokenForgotPassword(email));		
-			 mailService.sendForgotPassword(user.get(),"http://localhost:3000");
+			 mailService.sendForgotPassword(user.get(),"https://localhost:3000");
 			 UserRepo.save(user.get());
 			 response.setStatus(200);
 			 response.setMsg("Vui lòng đăng nhập vào gmail để thay đổi password");
